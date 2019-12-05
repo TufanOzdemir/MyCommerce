@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MyCommerce.Product.API.Models.Request;
@@ -26,13 +27,15 @@ namespace MyCommerce.Product.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IList<CategoryViewModel>), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get([FromQuery] CategoryRequest categoryRequest)
         {
             var query = _mapper.Map<CategoryRequest, CategoryQuery>(categoryRequest);
             var model = await _mediatr.Send(query);
             var result = _mapper.Map<IList<Category>, IList<CategoryViewModel>>(model);
-            return Ok(result);
+            return result == null || result.Count == 0 ? NotFound("Not Found") : (IActionResult)Ok(result);
         }
+
         // POST api/values
         [HttpPost]
         public void Post([FromBody] string value)

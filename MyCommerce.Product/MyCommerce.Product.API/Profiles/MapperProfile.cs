@@ -4,6 +4,7 @@ using MyCommerce.Product.API.Models.Response;
 using MyCommerce.Product.Application.Queries;
 using MyCommerce.Product.Domain;
 using MyCommerce.Product.Domain.Models.Search;
+using System.Collections.Generic;
 
 namespace MyCommerce.Product.API.Profiles
 {
@@ -18,7 +19,13 @@ namespace MyCommerce.Product.API.Profiles
             CreateMap<CategoryQuery, CategorySearchArgs>();
 
             CreateMap<Category, CategoryViewModel>();
-            CreateMap<Domain.Product, ProductViewModel>();
+            CreateMap<Domain.Product, ProductViewModel>()
+                .ForMember(dst => dst.Links, opt => opt.MapFrom(src =>
+                     new List<Link>
+                         {
+                            new Link { Rel="self", Url=string.Format($"localhost/api/product/{src.Id}") },
+                         }
+                ));
         }
     }
 }

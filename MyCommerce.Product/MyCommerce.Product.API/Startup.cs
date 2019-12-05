@@ -46,6 +46,12 @@ namespace MyCommerce.Product.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+            InitializeRepositories(services);
+            
+        }
+
+        private void InitializeRepositories(IServiceCollection services)
+        {
             services.AddScoped<IReadonlyProductRepository, ProductRepository>();
             services.AddScoped<IWriteonlyProductRepository, ProductRepository>();
             services.AddScoped<IReadonlyCategoryRepository, CategoryRepository>();
