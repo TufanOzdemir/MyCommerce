@@ -28,7 +28,7 @@ namespace MyCommerce.Authentication.Application.Token
             var tokenHandler = new JwtSecurityTokenHandler();
             var claims = new List<Claim>()
             {
-                new Claim(Consts.SecurityLevelClaimType, user == null ? SecurityLevel.Application.GetHashCode().ToString() : SecurityLevel.UserAndApplication.GetHashCode().ToString())
+                new Claim(Consts.SecurityLevelClaimType, SecurityLevel.Application.GetHashCode().ToString())
             };
             claims.AddRange(user.Permissions.Select(role => new Claim(Consts.ApplicationLevelClaimType, role.PermissionCode)));
             var now = DateTime.UtcNow;

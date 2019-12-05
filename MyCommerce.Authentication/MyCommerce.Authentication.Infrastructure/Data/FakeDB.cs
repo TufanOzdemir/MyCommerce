@@ -26,7 +26,7 @@ namespace MyCommerce.Authentication.Infrastructure.Data
                         },
                         new UserPermission
                         {
-                            PermissionCode = "CategoryRead"
+                            PermissionCode = "KategoriSorgulama"
                         }
                     }
                 }

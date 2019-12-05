@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using MyCommerce.Product.Application.Pipeline;
 using MyCommerce.Product.Domain;
 using MyCommerce.Product.Domain.Models.Search;
 using MyCommerce.Product.Domain.Repository;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace MyCommerce.Product.Application.Queries
 {
+    [RequiredPermission("KategoriSorgulama")]
     public class CategoryQuery : IRequest<IList<Category>>
     {
         public int Id { get; set; }
