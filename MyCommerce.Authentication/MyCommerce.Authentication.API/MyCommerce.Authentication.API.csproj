@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MyCommerce.Authentication.Application\MyCommerce.Authentication.Application.csproj" />
     <ProjectReference Include="..\MyCommerce.Authentication.Domain\MyCommerce.Authentication.Domain.csproj" />
+    <ProjectReference Include="..\MyCommerce.Authentication.Infrastructure\MyCommerce.Authentication.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

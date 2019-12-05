@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MyCommerce.Authentication.Application;
+using MyCommerce.Authentication.Application.Configuration;
+using MyCommerce.Authentication.Application.Token;
+using MyCommerce.Authentication.Domain.Persistence;
+using MyCommerce.Authentication.Infrastructure.Persistence;
 
 namespace MyCommerce.Authentication.API
 {
@@ -30,16 +27,24 @@ namespace MyCommerce.Authentication.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSecurity();
+
             services.AddMediatR(typeof(LoginQuery));
             var configuration = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MapperProfile());
             });
+            IMapper mapper = configuration.CreateMapper();
+            services.AddSingleton(mapper);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
+            services.AddScoped<IReadonlyAuthenticationRepository, AuthenticationRepository>();
+            services.AddSingleton<ITokenGenerator,SymmetricTokenGenerator>();
+            services.AddSingleton<IConfigResolver, ConfigResolver>();
+            services.AddSingleton(Configuration);
+            using (ServiceProvider provider = services.BuildServiceProvider())
+                services.AddSecurity(provider.GetService<IConfigResolver>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +63,7 @@ namespace MyCommerce.Authentication.API
             app.UseHttpsRedirection();
             app.UseMvc();
             app.UseAuthentication();
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");

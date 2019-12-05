@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MyCommerce.Authentication.Application.Configuration;
 using System;
 using System.Threading.Tasks;
 
@@ -8,8 +9,9 @@ namespace MyCommerce.Authentication.API
 {
     public static class SecurityRegistration
     {
-        public static IServiceCollection AddSecurity(this IServiceCollection services)
+        public static IServiceCollection AddSecurity(this IServiceCollection services, IConfigResolver configResolver)
         {
+            var resolver = configResolver.Resolve<AuthenticationConfig>();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -24,12 +26,12 @@ namespace MyCommerce.Authentication.API
                           ValidateLifetime = true,
                           ClockSkew = TimeSpan.Zero,
                           ValidateIssuer = true,
-                          ValidIssuer = "MngKargo.Authentication",
+                          ValidIssuer = "MyCommerce.Authentication",
 
                           ValidateAudience = false,
 
                           RequireSignedTokens = true,
-                          IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String("7211de8f-a2af-4b8c-aa49-17606bec91be"))
+                          IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(resolver.Secret))
                       };
                       options.Events = new JwtBearerEvents
                       {
