@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MyCommerce.Product.API.Models.Request;
 using MyCommerce.Product.API.Models.Response;
+using MyCommerce.Product.Application.Commands;
 using MyCommerce.Product.Application.Queries;
 using MyCommerce.Product.Domain;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyCommerce.Product.API.Controllers
 {
@@ -28,7 +28,7 @@ namespace MyCommerce.Product.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(typeof(IList<CategoryViewModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Get([FromQuery] CategoryRequest categoryRequest)
+        public async Task<IActionResult> Get([FromQuery] SearchCategoryRequest categoryRequest)
         {
             var query = _mapper.Map<CategoryRequest, CategoryQuery>(categoryRequest);
             var model = await _mediatr.Send(query);
@@ -36,22 +36,13 @@ namespace MyCommerce.Product.API.Controllers
             return result == null || result.Count == 0 ? NotFound("Not Found") : (IActionResult)Ok(result);
         }
 
-        // POST api/values
+        [Authorize]
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromQuery] CategoryCreateRequest request)
         {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var command = _mapper.Map<CategoryCreateRequest, CategoryCreateCommand>(request);
+            var model = await _mediatr.Send(command);
+            return Ok(model);
         }
     }
 }

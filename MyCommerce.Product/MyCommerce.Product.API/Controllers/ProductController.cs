@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MyCommerce.Product.API.Models.Request;
 using MyCommerce.Product.API.Models.Response;
 using MyCommerce.Product.Application.Queries;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyCommerce.Product.API.Controllers
 {
@@ -23,7 +21,6 @@ namespace MyCommerce.Product.API.Controllers
             _mediatr = mediatr;
             _mapper = mapper;
         }
-
         
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] ProductRequest productRequest)
@@ -32,25 +29,6 @@ namespace MyCommerce.Product.API.Controllers
             var model = await _mediatr.Send(query);
             var result = _mapper.Map<IList<Domain.Product>, IList<ProductViewModel>>(model);
             return Ok(result);
-        } 
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

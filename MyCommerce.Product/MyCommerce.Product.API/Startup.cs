@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using MyCommerce.Product.API.Configuration;
 using MyCommerce.Product.API.Middlewares;
 using MyCommerce.Product.API.Profiles;
+using MyCommerce.Product.Application.Commands;
 using MyCommerce.Product.Application.Pipeline;
 using MyCommerce.Product.Application.Queries;
 using MyCommerce.Product.Domain;
@@ -47,7 +49,9 @@ namespace MyCommerce.Product.API
 
             IMapper mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(CategoryCreateCommand)));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -75,6 +79,7 @@ namespace MyCommerce.Product.API
             services.AddSingleton(Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestAuthenticationBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
             using (ServiceProvider provider = services.BuildServiceProvider())
                 services.AddSecurity(provider.GetService<IConfigResolver>());
         }

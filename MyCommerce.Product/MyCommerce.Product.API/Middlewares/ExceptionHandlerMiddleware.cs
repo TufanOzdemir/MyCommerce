@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -28,15 +29,20 @@ namespace MyCommerce.Product.API.Middlewares
             {
                 await _next(context);
             }
-            catch (AuthenticationException ex)
+            catch (AuthenticationException)
             {
                 var exModel = new GeneralError { Message = "Not Authorized", Status = HttpStatusCode.Unauthorized };
+                await ContextDecorator(context, exModel);
+            }
+            catch (ValidationException ex)
+            {
+                var exModel = new GeneralError { Message = ex.Message, Status = HttpStatusCode.BadRequest };
                 await ContextDecorator(context, exModel);
             }
             catch (Exception ex)
             {
                 //Log at
-                var exModel = new GeneralError { Message = _hostingEnvironment.IsDevelopment() ? ex.ToString() : "An error occurred" , Status = HttpStatusCode.InternalServerError };
+                var exModel = new GeneralError { Message = _hostingEnvironment.IsDevelopment() ? ex.ToString() : "An error occurred", Status = HttpStatusCode.InternalServerError };
                 await ContextDecorator(context, exModel);
             }
         }

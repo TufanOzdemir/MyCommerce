@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyCommerce.Product.API.Models.Request;
 using MyCommerce.Product.API.Models.Response;
+using MyCommerce.Product.Application.Commands;
 using MyCommerce.Product.Application.Queries;
 using MyCommerce.Product.Domain;
 using MyCommerce.Product.Domain.Models.Search;
@@ -12,7 +13,7 @@ namespace MyCommerce.Product.API.Profiles
     {
         public MapperProfile()
         {
-            CreateMap<CategoryRequest, CategoryQuery>();
+            CreateMap<SearchCategoryRequest, CategoryQuery>();
             CreateMap<ProductRequest, ProductQuery>();
             CreateMap<ProductQuery, ProductSearchArgs>();
             CreateMap<CategoryQuery, Category>();
@@ -26,6 +27,9 @@ namespace MyCommerce.Product.API.Profiles
                             new Link { Rel="self", Url=string.Format($"localhost/api/product/{src.Id}") },
                          }
                 ));
+
+            CreateMap<CategoryCreateRequest, CategoryCreateCommand>();
+            CreateMap<CategoryCreateCommand, Category>();
         }
     }
 }
