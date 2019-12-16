@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation.AspNetCore;
 using MassTransit;
 using MassTransit.RabbitMqTransport;
@@ -11,25 +6,23 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using MyCommerce.Basket.API.Configuration;
+using MyCommerce.Basket.API.Middlewares;
+using MyCommerce.Basket.API.Profiles;
+using MyCommerce.Basket.Application.Commands;
+using MyCommerce.Basket.Application.Consumers;
+using MyCommerce.Basket.Application.Pipeline;
+using MyCommerce.Basket.Application.Queries;
+using MyCommerce.Basket.Domain.Repository;
+using MyCommerce.Basket.Infrastructure.Repository;
 using MyCommerce.Common.Core;
-using MyCommerce.Product.API.Configuration;
-using MyCommerce.Product.API.Middlewares;
-using MyCommerce.Product.API.Profiles;
-using MyCommerce.Product.Application.Commands;
-using MyCommerce.Product.Application.Pipeline;
-using MyCommerce.Product.Application.Queries;
-using MyCommerce.Product.Domain;
-using MyCommerce.Product.Domain.Repository;
-using MyCommerce.Product.Infrastructure.Repository;
+using System;
 
-namespace MyCommerce.Product.API
+namespace MyCommerce.Basket.API
 {
     public class Startup
     {
@@ -44,7 +37,7 @@ namespace MyCommerce.Product.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMediatR(typeof(CategoryQuery));
+            services.AddMediatR(typeof(BasketQuery));
             var configuration = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MapperProfile());
@@ -53,7 +46,7 @@ namespace MyCommerce.Product.API
             IMapper mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(CategoryCreateCommand)));
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(AddBasketCommand)));
 
             services.AddSwaggerGen(c =>
             {
@@ -88,7 +81,14 @@ namespace MyCommerce.Product.API
                 var resolver = provider.GetService<IConfigResolver>();
                 services.AddSecurity(resolver);
                 var rabbitMQConfig = resolver.Resolve<RabbitMQConfig>();
-                AddEventBus(services, rabbitMQConfig, null);
+                AddEventBus(services, rabbitMQConfig, (factory, host, cfg) =>
+                {
+                    cfg.ReceiveEndpoint(host, nameof(AddBasketMessage), e =>
+                    {
+                        e.Consumer<AddBasketMessageConsumer>(factory);
+                    });
+                });
+                services.AddScoped<AddBasketMessageConsumer>();
             }
         }
 
@@ -114,10 +114,8 @@ namespace MyCommerce.Product.API
 
         private void InitializeRepositories(IServiceCollection services)
         {
-            services.AddScoped<IReadonlyProductRepository, ProductRepository>();
-            services.AddScoped<IWriteonlyProductRepository, ProductRepository>();
-            services.AddScoped<IReadonlyCategoryRepository, CategoryRepository>();
-            services.AddScoped<IWriteonlyCategoryRepository, CategoryRepository>();
+            services.AddScoped<IReadonlyBasketRepository, BasketRepository>();
+            services.AddScoped<IWriteonlyBasketRepository, BasketRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

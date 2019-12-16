@@ -5,7 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" Version="6.0.0" />
     <PackageReference Include="MassTransit.AspNetCore" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MyCommerce.Common.Core">
+      <HintPath>..\References\MyCommerce.Common.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

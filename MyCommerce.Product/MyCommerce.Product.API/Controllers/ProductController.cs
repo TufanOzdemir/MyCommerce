@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MyCommerce.Product.API.Models.Request;
+using MyCommerce.Product.API.Models.Request.Product;
 using MyCommerce.Product.API.Models.Response;
+using MyCommerce.Product.Application.Events;
 using MyCommerce.Product.Application.Queries;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,6 +31,14 @@ namespace MyCommerce.Product.API.Controllers
             var model = await _mediatr.Send(query);
             var result = _mapper.Map<IList<Domain.Product>, IList<ProductViewModel>>(model);
             return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddToBasket([FromQuery] AddToBasketRequest addToBasketRequest)
+        {
+            var query = _mapper.Map<AddToBasketRequest, AddToBasketEvent>(addToBasketRequest);
+            await _mediatr.Publish(query);
+            return Ok(true);
         }
     }
 }
