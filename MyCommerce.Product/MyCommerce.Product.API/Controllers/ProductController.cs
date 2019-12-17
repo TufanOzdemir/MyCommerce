@@ -33,6 +33,7 @@ namespace MyCommerce.Product.API.Controllers
             return Ok(result);
         }
 
+        [Route("AddToBasket")]
         [HttpGet]
         public async Task<IActionResult> AddToBasket([FromQuery] AddToBasketRequest addToBasketRequest)
         {

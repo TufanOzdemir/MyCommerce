@@ -46,7 +46,7 @@ namespace MyCommerce.Basket.API
             IMapper mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(AddBasketCommand)));
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(AddToBasketCommand)));
 
             services.AddSwaggerGen(c =>
             {
@@ -81,18 +81,12 @@ namespace MyCommerce.Basket.API
                 var resolver = provider.GetService<IConfigResolver>();
                 services.AddSecurity(resolver);
                 var rabbitMQConfig = resolver.Resolve<RabbitMQConfig>();
-                AddEventBus(services, rabbitMQConfig, (factory, host, cfg) =>
-                {
-                    cfg.ReceiveEndpoint(host, nameof(AddBasketMessage), e =>
-                    {
-                        e.Consumer<AddBasketMessageConsumer>(factory);
-                    });
-                });
+                AddEventBus(services, rabbitMQConfig);
                 services.AddScoped<AddBasketMessageConsumer>();
             }
         }
 
-        private IServiceCollection AddEventBus(IServiceCollection services, RabbitMQConfig config, Action<IServiceProvider, IRabbitMqHost, IRabbitMqBusFactoryConfigurator> action)
+        private IServiceCollection AddEventBus(IServiceCollection services, RabbitMQConfig config)
         {
             services.AddMassTransit(x =>
             {
@@ -104,7 +98,10 @@ namespace MyCommerce.Basket.API
                         hostConfigurator.Password(config.Password);
                     });
 
-                    action(factory, host, cfg);
+                    cfg.ReceiveEndpoint(host, nameof(AddBasketMessage), e =>
+                    {
+                        e.Consumer(()=> new AddBasketMessageConsumer(factory.GetService<IMediator>()));
+                    });
                 }));
             });
 

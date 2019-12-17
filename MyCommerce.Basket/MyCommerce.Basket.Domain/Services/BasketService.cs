@@ -7,23 +7,28 @@ namespace MyCommerce.Basket.Domain.Services
 {
     public class BasketService
     {
-        private readonly IReadonlyBasketRepository _readonlyCategoryRepository;
-        private readonly IWriteonlyBasketRepository _writeonlyCategoryRepository;
+        private readonly IReadonlyBasketRepository _readonlyBasketRepository;
+        private readonly IWriteonlyBasketRepository _writeonlyBasketRepository;
 
-        public BasketService(IReadonlyBasketRepository readonlyCategoryRepository, IWriteonlyBasketRepository writeonlyCategoryRepository)
+        public BasketService(IReadonlyBasketRepository readonlyBasketRepository, IWriteonlyBasketRepository writeonlyBasketRepository)
         {
-            _readonlyCategoryRepository = readonlyCategoryRepository;
-            _writeonlyCategoryRepository = writeonlyCategoryRepository;
+            _readonlyBasketRepository = readonlyBasketRepository;
+            _writeonlyBasketRepository = writeonlyBasketRepository;
         }
 
         public Task<IList<Basket>> Get(BasketSearchArgs args)
         {
-            return _readonlyCategoryRepository.Get(args);
+            return _readonlyBasketRepository.Get(args);
         }
 
-        public async Task Create(Basket category)
+        public async Task Create(Basket basket)
         {
-            await _writeonlyCategoryRepository.Create(category);
+            await _writeonlyBasketRepository.Create(basket);
+        }
+
+        public async Task AddToBasket(Basket basket)
+        {
+            await _writeonlyBasketRepository.AddToBasket(basket);
         }
     }
 }

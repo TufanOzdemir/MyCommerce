@@ -17,10 +17,11 @@ namespace MyCommerce.Basket.Application.Consumers
 
         public Task Consume(ConsumeContext<AddBasketMessage> context)
         {
-            var command = new AddBasketCommand()
+            var command = new AddToBasketCommand()
             {
                 CustomerGuid = context.Message.CustomerGuid,
-                Id = context.Message.Id
+                Id = context.Message.Id,
+                
             };
             return _mediator.Send(command);
         }

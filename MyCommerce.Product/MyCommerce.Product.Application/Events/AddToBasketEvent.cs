@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using MediatR;
+using MyCommerce.Common.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,14 @@ namespace MyCommerce.Product.Application.Events
 
         public Task Handle(AddToBasketEvent notification, CancellationToken cancellationToken)
         {
-            return _busControl.Publish(new AddToBasketEvent { CustomerGuid = notification.CustomerGuid, ProductId = notification.ProductId, TransactionId = Guid.NewGuid() });
+            return _busControl.Publish(
+                new AddBasketMessage()
+                {
+                    CustomerGuid = notification.CustomerGuid,
+                    IpAddress = "127.0.0.1",
+                    Id = notification.ProductId,
+                    TransactionId = Guid.NewGuid()
+                });
         }
     }
 }

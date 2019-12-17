@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace MyCommerce.Basket.Application.Commands
 {
-    public class AddBasketCommand : IRequest<bool>
+    public class AddToBasketCommand : IRequest<bool>
     {
         public Guid CustomerGuid { get; set; }
         public int Id { get; set; }
+        public int ProductId { get; set; }
     }
 
-    public class CategoryCreateCommandHandler : IRequestHandler<AddBasketCommand,bool>
+    public class CategoryCreateCommandHandler : IRequestHandler<AddToBasketCommand,bool>
     {
         private readonly IMapper _mapper;
         private readonly IReadonlyBasketRepository _readonlyBasketRepository;
@@ -27,11 +28,11 @@ namespace MyCommerce.Basket.Application.Commands
             _writeonlyBasketRepository = writeonlyBasketRepository;
         }
 
-        public async Task<bool> Handle(AddBasketCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(AddToBasketCommand request, CancellationToken cancellationToken)
         {
-            var model = _mapper.Map<AddBasketCommand, Domain.Basket>(request);
+            var model = _mapper.Map<AddToBasketCommand, Domain.Basket>(request);
             var service = new BasketService(_readonlyBasketRepository, _writeonlyBasketRepository);
-            await service.Create(model);
+            await service.AddToBasket(model);
             return true;
         }
     }

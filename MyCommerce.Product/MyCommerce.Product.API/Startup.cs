@@ -88,7 +88,7 @@ namespace MyCommerce.Product.API
                 var resolver = provider.GetService<IConfigResolver>();
                 services.AddSecurity(resolver);
                 var rabbitMQConfig = resolver.Resolve<RabbitMQConfig>();
-                AddEventBus(services, rabbitMQConfig, null);
+                AddEventBus(services, rabbitMQConfig, (factory, host, cfg) => { });
             }
         }
 
@@ -103,7 +103,6 @@ namespace MyCommerce.Product.API
                         hostConfigurator.Username(config.Username);
                         hostConfigurator.Password(config.Password);
                     });
-
                     action(factory, host, cfg);
                 }));
             });
