@@ -3,6 +3,7 @@ using MediatR;
 using MyCommerce.Basket.Domain.Models.Search;
 using MyCommerce.Basket.Domain.Repository;
 using MyCommerce.Basket.Domain.Services;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,8 +12,8 @@ namespace MyCommerce.Basket.Application.Queries
 {
     public class BasketQuery : IRequest<IList<Domain.Basket>>
     {
-        public int Id { get; set; }
-        public int CustomerGuid { get; set; }
+        public int? Id { get; set; }
+        public Guid? CustomerGuid { get; set; }
     }
 
     public class CategoryQueryHandler : IRequestHandler<BasketQuery, IList<Domain.Basket>>

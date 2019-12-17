@@ -3,6 +3,7 @@ using MediatR;
 using MyCommerce.Basket.Domain.Repository;
 using MyCommerce.Basket.Domain.Services;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,6 +32,7 @@ namespace MyCommerce.Basket.Application.Commands
         public async Task<bool> Handle(AddToBasketCommand request, CancellationToken cancellationToken)
         {
             var model = _mapper.Map<AddToBasketCommand, Domain.Basket>(request);
+            model.ProductIds = new List<int>() { request.ProductId };
             var service = new BasketService(_readonlyBasketRepository, _writeonlyBasketRepository);
             await service.AddToBasket(model);
             return true;

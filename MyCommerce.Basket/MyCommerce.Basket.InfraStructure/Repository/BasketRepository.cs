@@ -1,6 +1,7 @@
 ﻿using MyCommerce.Basket.Domain.Models.Search;
 using MyCommerce.Basket.Domain.Repository;
 using MyCommerce.Basket.Infrastructure.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,10 @@ namespace MyCommerce.Basket.Infrastructure.Repository
         public async Task Create(Domain.Basket basket)
         {
             var baskets = await _fakeDB.BasketsAsync();
+            if (basket.CustomerGuid == Guid.Empty)
+            {
+                basket.CustomerGuid = Guid.NewGuid();
+            }
             baskets.Add(basket);
         }
 
@@ -32,13 +37,17 @@ namespace MyCommerce.Basket.Infrastructure.Repository
             }
             else
             {
-                baskets.Add(basket);
+                await Create(basket);
             }
         }
 
         public async Task<IList<Domain.Basket>> Get(BasketSearchArgs args)
         {
             var baskets = await _fakeDB.BasketsAsync();
+            if (args.CustomerGuid == null && !args.Id.HasValue)
+            {
+                return baskets;
+            }
             if (args.Id.HasValue)
             {
                 return baskets.Where(c => c.Id == args.Id).ToList();

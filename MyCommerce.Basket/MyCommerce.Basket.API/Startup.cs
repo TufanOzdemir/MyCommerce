@@ -45,8 +45,8 @@ namespace MyCommerce.Basket.API
 
             IMapper mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(AddToBasketCommand)));
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                //.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining(typeof(AddToBasketCommand)));
 
             services.AddSwaggerGen(c =>
             {
@@ -100,7 +100,7 @@ namespace MyCommerce.Basket.API
 
                     cfg.ReceiveEndpoint(host, nameof(AddBasketMessage), e =>
                     {
-                        e.Consumer(()=> new AddBasketMessageConsumer(factory.GetService<IMediator>()));
+                        e.Consumer<AddBasketMessageConsumer>(factory);
                     });
                 }));
             });

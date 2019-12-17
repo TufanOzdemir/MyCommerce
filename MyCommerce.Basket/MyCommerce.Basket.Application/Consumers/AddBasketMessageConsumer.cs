@@ -2,6 +2,7 @@
 using MediatR;
 using MyCommerce.Basket.Application.Commands;
 using MyCommerce.Common.Core;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MyCommerce.Basket.Application.Consumers
@@ -20,8 +21,7 @@ namespace MyCommerce.Basket.Application.Consumers
             var command = new AddToBasketCommand()
             {
                 CustomerGuid = context.Message.CustomerGuid,
-                Id = context.Message.Id,
-                
+                ProductId = context.Message.Id 
             };
             return _mediator.Send(command);
         }
